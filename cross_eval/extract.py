@@ -8,6 +8,7 @@ second run only reads newly finished jobs.
 import argparse
 import json
 import os
+import re
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
@@ -76,6 +77,9 @@ def finished_jobs(experiment):
     jobs = []
     for obj in sorted(p for p in experiment.iterdir() if p.is_dir()):
         for rep in sorted(obj.glob('rep_*')):
+            # Drive makes 'rep_2 (1)' when two runtimes wrote the same job; keep the canonical folder only.
+            if not re.fullmatch(r'rep_\d+', rep.name):
+                continue
             if (rep / 'paired_test.json').exists() and (rep / 'summary.json').exists():
                 jobs.append(rep)
     return jobs

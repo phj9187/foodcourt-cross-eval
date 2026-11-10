@@ -49,6 +49,7 @@ class CrossEvalTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             d = Path(d); make_experiment(d / 'exp', objs)
             (d / 'exp' / 'lhs_0000' / 'rep_9').mkdir()  # unfinished job must be skipped
+            import shutil; shutil.copytree(d / 'exp' / 'lhs_0001' / 'rep_0', d / 'exp' / 'lhs_0001' / 'rep_0 (1)')  # Drive duplicate
             self.assertEqual(extract.main([str(d / 'exp'), str(d / 'cache'), '--workers', '2']), 0)
             self.assertEqual(len(list((d / 'cache').glob('*.npz'))), 12)
             self.assertEqual(extract.main([str(d / 'exp'), str(d / 'cache'), '--workers', '2']), 0)  # all cached

@@ -15,6 +15,7 @@ Outputs (in --out):
 """
 import argparse
 import json
+import re
 from pathlib import Path
 
 import numpy as np
@@ -27,6 +28,8 @@ SPLITS = {'stable': False, 'changed': True}
 def load(cache):
     jobs = []
     for f in sorted(Path(cache).glob('*.npz')):
+        if not re.fullmatch(r'.+__rep_\d+', f.stem):  # skip Drive duplicates such as 'rep_2 (1)'
+            continue
         z = np.load(f, allow_pickle=False)
         d = {k: z[k] for k in z.files}
         d['objective'] = json.loads(str(d.pop('objective_json')))
